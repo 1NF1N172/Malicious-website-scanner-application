@@ -1,0 +1,1067 @@
+<!-- result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detection Result</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <!-- Include Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Basic Reset and Styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to top, #113d24, #0d1b2a);
+            color: #d4d4d4;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 16px;
+            z-index: 1000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #324466;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background-color: #1b2943;
+        }
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #324466 #1b2943;
+        }
+
+        /* Body Layout */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%),
+                        radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%);
+            background-size: 4px 4px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Logo Styling */
+        .logo {
+            margin: 10px 0;
+            text-align: center;
+            z-index: 1;
+            box-shadow: 1 5px 50px rgba(22, 22, 22, 0.5);
+            position: relative;
+        }
+        .logo img {
+            width: 140px;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.3s;
+            transform-origin: center center;
+        }
+        .logo img:hover {
+            opacity: 0.8;
+        }
+        /* Define the spin animation with slow start and stop */
+        @keyframes spinLogo {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Define the zoom and spin animation for page load */
+        @keyframes zoomSpinOnce {
+            from {
+                transform: scale(2) rotate(0deg);
+            }
+            to {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+
+        /* Class to trigger the spin */
+        .spin-once {
+            animation: spinLogo 1s ease-in-out;
+            transform-origin: center center;
+        }
+
+        /* Class to trigger the zoom and spin on page load */
+        .zoom-spin-once {
+            animation: zoomSpinOnce 1s ease-in-out;
+            transform-origin: center center;
+        }
+
+        /* Button Container Styles */
+        .button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .gradient-button {
+            background: linear-gradient(to bottom, #253f65, #113d24);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.4s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-button:hover {
+            background: linear-gradient(to bottom, #253f65, #113d24);
+        }
+
+        /* Hamburger Menu Button */
+        .menu-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Side Panel Styles */
+        .side-panel {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1002;
+            top: 0;
+            right: 0;
+            background-color: #253f65;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .side-panel a {
+            padding: 10px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #d4d4d4;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .side-panel a:hover {
+            box-shadow: 10px 8px 50px rgba(22, 22, 22, 0.5);
+        }
+
+        .side-panel .closebtn {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            font-size: 24px; /* Adjusted size for the icon */
+            color: #ffffff;
+            background: none; /* Remove default button background */
+            border: none; /* Remove default button border */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            padding: 0; /* Remove default padding */
+        }
+
+        .side-panel .closebtn:hover {
+            color: #ff0000; /* Optional: Change color on hover */
+        }
+
+        /* Content Wrapper to Center Main Content */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        /* Container for Detection Results */
+        .container {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+            background-color: #1b2943;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 6px 50px rgba(22, 22, 22, 0.5);
+            z-index: 1;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Flex Container for Detection Result and Preview */
+        .result-preview-container {
+            display: flex;
+            flex-wrap: nowrap;
+            width: 100%;
+            position: relative;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+        /* Detection Result Section */
+        .location-info {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 15px;
+            background-color: #253f65;
+            box-shadow: 0 3px 50px rgba(22, 22, 22, 0.5);
+            border-radius: 8px;
+            position: relative;
+            overflow: visible;
+            transition: flex 0.5s ease;
+            flex: 1;
+            text-align: center;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Adjusted Header Styling */
+        .location-info h1 {
+            color: #81c784;
+            margin: 20px 0 10px 0;
+        }
+
+        .location-info h2 {
+            color: #81c784;
+            margin: 10px 0;
+        }
+
+        .location-info p {
+            color: #d4d4d4;
+            line-height: 1.4;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        /* Add bottom margin to the last paragraph in location-info */
+        .location-info p:last-of-type {
+            margin-bottom: 20px;
+        }
+
+        /* Toggle Switch Styling with Eye Icons */
+        .toggle-switch-container {
+            position: absolute;
+            top: -10px; /* Moved up by adjusting the top value */
+            right: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .switch {
+            display: inline-block;
+            width: 60px;
+            height: 28px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-color: #1d2951;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); /* Added box-shadow */
+        }
+
+        /* Circle inside the toggle */
+        .slider::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        /* Circle movement when toggled */
+        input:checked + .slider::before {
+            transform: translateX(26px); /* Adjust this value based on your toggle's width */
+        }
+
+        /* Eye icons */
+        .slider .icon-eye,
+        .slider .icon-eye-slash {
+            position: absolute;
+            top: 14px; /* Center vertically within the circle */
+            left: 14px; /* Initial horizontal center */
+            transform: translate(-50%, -50%);
+            font-size: 16px;
+            color: #1d2951;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        /* Move the eye icon along with the circle when toggled */
+        input:checked + .slider .icon-eye-slash {
+            transform: translate(23px, -50%); /* Move horizontally with the circle */
+        }
+
+        .slider .icon-eye {
+            opacity: 1;
+        }
+
+        .slider .icon-eye-slash {
+            opacity: 0;
+        }
+
+        /* Move circle and change icons when checked */
+        input:checked + .slider::before {
+            transform: translateX(32px);
+        }
+
+        input:checked + .slider .icon-eye {
+            opacity: 0;
+        }
+
+        input:checked + .slider .icon-eye-slash {
+            opacity: 1;
+        }
+
+        /* Tooltip for Toggle Switch */
+        .switch .tooltip {
+            display: none;
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        /* Show tooltip on hover */
+        .switch:hover .tooltip {
+            display: block;
+            opacity: 1;
+        }
+
+        /* Optional hover effect for the switch */
+        .switch:hover .slider {
+            background-color: #435b86;
+        }
+
+        /* More Information Button Styling */
+        .show-more-button {
+            background-color: #2c3e50;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .show-more-button:hover {
+            background-color: #34495e;
+        }
+
+        /* More Information Section */
+        .more-info {
+            display: none;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #253f65;
+            box-shadow: 0 3px 50px rgba(22, 22, 22, 0.5);
+            border-radius: 8px;
+            text-align: left;
+            width: 98%;
+        }
+        .more-info h2 {
+            color: #81c784;
+            text-align: center;
+            margin-bottom: 0px;
+        }
+        .more-info p {
+            color: #d4d4d4;
+            margin: 5px 0;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Feedback Section */
+        .feedback {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .feedback-button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .feedback-button {
+            border: none;
+            background-color: #324466;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, transform 0.3s;
+            position: relative;
+        }
+        .feedback-button img {
+            width: 35px;
+            height: 35px;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        .feedback-button:hover {
+            background-color: #435b86;
+            transform: scale(1.05);
+        }
+
+        /* Tooltip for Feedback Buttons */
+        .feedback-button .tooltip {
+            display: none;
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 12px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feedback-button:hover .tooltip {
+            display: block;
+            opacity: 1;
+        }
+
+        .feedback-message {
+            text-align: center;
+            color: #ffffff;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        /* Preview Window Styling */
+        .preview-window {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 15px;
+            background-color: #253f65;
+            box-shadow: 0 3px 50px rgba(22, 22, 22, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: width 0.5s ease, opacity 0.5s ease;
+            flex: 0 0 auto;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 520px;
+        }
+
+        /* When Preview is Visible */
+        .preview-window.visible {
+            display: flex;
+            width: 60%;
+            opacity: 1;
+        }
+
+        /* Iframe Wrapper */
+        .iframe-wrapper {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Iframe Styling within Preview Window */
+        .preview-window iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 166.666%;
+            height: 166.666%;
+            border: none;
+            pointer-events: none;
+            transform: scale(0.6);
+            transform-origin: 0 0;
+        }
+
+        /* Hide Scrollbars for WebKit Browsers */
+        .preview-window iframe::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Status and Prediction Styles */
+        .prediction-legitimate {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .prediction-phishing {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .prediction-unknown {
+            color: #a6a6a6;
+            font-weight: bold;
+        }
+        .ssl-validation-valid {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .ssl-validation-invalid {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .status-online {
+            color: #28a745; 
+            font-weight: bold;
+        }
+        .status-offline {
+            color: #dc3545; 
+            font-weight: bold;
+        }
+        .no-info {
+            color: #dc3545;
+            font-style: italic;
+        }
+        #result-subdomains {
+            word-wrap: break-word;  
+            white-space: normal;    
+            overflow-wrap: break-word; 
+            max-width: 100%;        
+        }
+
+        /* Map Styling */
+        #map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 3px 50px rgba(22, 22, 22, 0.5);
+            margin-top: 20px;
+        }
+
+        /* Make URLs more visible */
+        .url-container a {
+            color: #1e90ff;
+            text-decoration: underline;
+            font-weight: bold;
+        }
+
+        .url-container a:hover {
+            color: #63b3ff;
+            text-decoration: none;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .result-preview-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .location-info, .preview-window {
+                max-width: 100%;
+                flex: 1 1 100%;
+                margin: 10px 0;
+                width: 100%;
+            }
+            .preview-window {
+                width: 100%;
+                height: auto;
+                opacity: 0;
+                transition: width 0.5s ease, opacity 0.5s ease;
+            }
+            .preview-window.visible {
+                width: 100%;
+                opacity: 1;
+            }
+            .location-info.preview-visible {
+                width: 100%;
+            }
+            /* Adjust Iframe Wrapper */
+            .iframe-wrapper {
+                width: 100%;
+                height: 0;
+                padding-bottom: 75%;
+                overflow: hidden;
+                position: relative;
+            }
+            /* Adjust Iframe */
+            .preview-window iframe {
+                width: 166.666%;
+                height: 166.666%;
+                transform: scale(0.6);
+            }
+            /* Adjust More Information Button and Section for Smaller Screens */
+            .show-more-button {
+                padding: 8px 16px;
+                margin-top: 10px;
+                margin-bottom: 5px;
+            }
+            .more-info {
+                padding: 10px;
+            }
+            /* Adjust Toggle Switch for Smaller Screens */
+            .switch {
+                width: 60px;
+                height: 28px;
+            }
+            .slider::before {
+                height: 24px;
+                width: 24px;
+                left: 2px;
+                top: 2px;
+            }
+            input:checked + .slider::before {
+                transform: translateX(32px);
+            }
+
+            /* Adjust Tooltip Position for Smaller Screens */
+            .switch .tooltip {
+                top: -40px;
+            }
+
+            /* Adjust Feedback Button Tooltip Position for Smaller Screens */
+            .feedback-button .tooltip {
+                top: -40px;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body data-show-login-modal="{{ show_login_modal|default(false)|tojson }}"
+      data-show-register-modal="{{ show_register_modal|default(false)|tojson }}">
+          <!-- Side Panel -->
+    <div id="side-panel" class="side-panel">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidePanel()">
+            <i class="fas fa-times"></i>
+        </a>
+        <a href="{{ url_for('auth.account') }}">Account</a>
+        <a href="{{ url_for('auth.settings') }}">Settings</a>
+        <hr style="border: 0; height: 1px; background: #120545; margin: 20px 0;">
+        <a href="{{ url_for('auth.history') }}">History</a>
+        <a href="{{ url_for('auth.favourites') }}">Favourites</a>
+        <hr style="border: 0; height: 1px; background: #120545; margin: 20px 0;">
+        <a href="{{ url_for('auth.help') }}">Help</a>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+
+        <!-- Add more navigation links as needed -->
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo">
+        <!-- Button Container -->
+        <div class="button-container">
+            {% if current_user.is_authenticated %}
+                <button class="menu-button" id="menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            {% else %}
+                <button class="gradient-button" id="signup-btn">Sign Up</button>
+                <button class="gradient-button" id="login-btn">Login</button>
+            {% endif %}
+        </div>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" onclick="redirectToSearchPage()">
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
+        <div class="container">
+            <!-- Result and Preview Container -->
+            <div class="result-preview-container">
+                <!-- Detection Result and Location Information -->
+                <div class="location-info">
+                    <!-- Toggle Switch Container Positioned at Top-Right Corner -->
+                    {% if status == 'Online' and pred != 1 %}
+                    <div class="toggle-switch-container">
+                        <label class="switch" aria-label="Toggle Preview">
+                            <input type="checkbox" id="toggle-preview" onclick="togglePreview()" aria-pressed="false">
+                            <span class="slider round">
+                                <i class="fas fa-eye icon-eye"></i>
+                                <i class="fas fa-eye-slash icon-eye-slash"></i>
+                            </span>
+                            <div class="tooltip" id="toggle-tooltip">Show preview of the site</div>
+                        </label>
+                    </div>
+                    {% endif %}
+
+                    <h1>Detection Result</h1>
+                    
+                    <div class="result">
+                        <p><strong>URL:</strong> 
+                            <span class="url-container">
+                                <a id="result-url" href="{{ link }}" target="_blank">{{ link }}</a>
+                            </span>
+                        </p>
+                        <p><strong>Status:</strong> <span class="{{ 'status-online' if status == 'Online' else 'status-offline' }}">{{ status }}</span></p>
+                        <p><strong>Malicious Prediction:</strong> <span id="prediction" class="{{ 'prediction-unknown' if status == 'Offline' else ('prediction-legitimate' if not pred else 'prediction-phishing') }}">{{ 'Not Available' if status == 'Offline' else ('Legitimate' if not pred else 'Phishing') }}</span></p>
+                        <p><strong>SSL Validation:</strong> <span id="ssl-validation" class="{{ 'ssl-validation-valid' if ssl_valid else 'ssl-validation-invalid' }}">{{ 'Valid' if ssl_valid else 'Invalid' }}</span></p>
+                        <p><strong>IP Address:</strong> <span id="result-ip">{{ ip }}</span></p>
+                    </div>
+
+                    {% if location_info %}
+                    <div>
+                        <h2>Location Information</h2>
+                        <p><strong>Country:</strong> <span id="result-country">{{ location_info.country }}</span></p>
+                        <p><strong>Region:</strong> <span id="result-region">{{ location_info.region }}</span></p>
+                        <p><strong>City:</strong> <span id="result-city">{{ location_info.city }}</span></p>
+                        <p><strong>Latitude:</strong> <span id="result-latitude">{{ location_info.latitude }}</span></p>
+                        <p><strong>Longitude:</strong> <span id="result-longitude">{{ location_info.longitude }}</span></p>
+                        <p><strong>Zip Code:</strong> <span id="result-zip">{{ location_info.zip }}</span></p>
+                        <p><strong>Time Zone:</strong> <span id="result-timezone">{{ location_info.timezone }}</span></p>
+                    </div>
+                    {% else %}
+                        <div>
+                            <p class="no-info">No location information available.</p>
+                        </div>
+                    {% endif %}
+                </div>
+                <!-- Preview Window -->
+                <div class="preview-window" id="preview-window">
+                    <div class="iframe-wrapper">
+                        <iframe src="" id="preview-iframe" sandbox="" scrolling="no"></iframe>
+                    </div>
+                    <!-- Optional overlay to prevent interactions -->
+                    <div class="preview-overlay"></div>
+                </div>
+            </div>
+
+            <!-- More Information Section -->
+            <button class="show-more-button" onclick="toggleMoreInfo()">More Information ↓</button>
+            <div class="more-info" id="more-info">
+                <h2>Domain Information</h2>
+                <br>
+                <p><strong>Registrar:</strong> <span id="result-registrar">{{ whois_info.registrar if whois_info.registrar else 'No information provided' }}</span></p>
+                <p><strong>Creation Date:</strong> <span id="result-creation-date">{{ whois_info.creation_date if whois_info.creation_date else 'No information provided' }}</span></p>
+                <p><strong>Expiration Date:</strong> <span id="result-expiration-date">{{ whois_info.expiration_date if whois_info.expiration_date else 'No information provided' }}</span></p>
+                <p><strong>Updated Date:</strong> <span id="result-updated-date">{{ whois_info.updated_date if whois_info.updated_date else 'No information provided' }}</span></p>
+                <p><strong>Nameservers:</strong> <span id="result-name_servers">{{ whois_info.name_servers if whois_info.name_servers else 'No information provided' }}</span></p>
+                <p><strong>Contact Email:</strong> <span id="result-contact-email">{{ whois_info.contact_email if whois_info.contact_email else 'No information provided' }}</span></p>
+                <hr style="border: 0; height: 1px; background: #120545; margin: 20px 0;">
+                <p><strong>Subdomains:</strong> <span id="result-subdomains">{{ subdomains | join(", ") if subdomains else 'No subdomains detected' }}</span></p>
+            </div>
+
+            <!-- Feedback Section -->
+            <div class="feedback">
+                <div class="feedback-button-container">
+                    <button id="new-search-button" class="feedback-button new-search" onclick="redirectToSearchPage()">
+                        <img src="{{ url_for('static', filename='images/new.png') }}" alt="New Search Icon">
+                        <div class="tooltip">New Search</div>
+                    </button>
+                    <button id="copy-button" class="feedback-button" onclick="copyToClipboard()">
+                        <img src="{{ url_for('static', filename='images/clipboard.png') }}" alt="Copy to Clipboard Icon">
+                        <div class="tooltip">Copy to Clipboard</div>
+                    </button>
+                </div>
+                <div id="feedback-message" class="feedback-message"></div>
+            </div>
+            <!-- Map Section -->
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2023-2025 Developed by Manuel Vasilev (23651808) as part of graduation thesis. All rights reserved.
+    </footer>
+
+    <!-- Include Modals -->
+    {% include '_login_modal.html' %}
+    {% include '_register_modal.html' %}
+
+    <!-- Leaflet JS Library -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Redirect to Search Page
+        function redirectToSearchPage() {
+            window.location.href = "/";
+        }
+
+        // Copy Results to Clipboard
+        function copyToClipboard() {
+            const resultText = `
+URL: ${document.getElementById('result-url').href}
+Status: ${document.querySelector('.status-online, .status-offline').innerText}
+Malicious Prediction: ${document.getElementById('prediction').innerText}
+SSL Validation: ${document.getElementById('ssl-validation').innerText}
+IP Address: ${document.getElementById('result-ip').innerText}
+Country: ${document.getElementById('result-country').innerText}
+Region: ${document.getElementById('result-region').innerText}
+City: ${document.getElementById('result-city').innerText}
+Latitude: ${document.getElementById('result-latitude').innerText}
+Longitude: ${document.getElementById('result-longitude').innerText}
+Zip Code: ${document.getElementById('result-zip').innerText}
+Time Zone: ${document.getElementById('result-timezone').innerText}
+Registrar: ${document.getElementById('result-registrar').innerText}
+Creation Date: ${document.getElementById('result-creation-date').innerText}
+Expiration Date: ${document.getElementById('result-expiration-date').innerText}
+Updated Date: ${document.getElementById('result-updated-date').innerText}
+Nameservers: ${document.getElementById('result-name_servers').innerText}
+Contact Email: ${document.getElementById('result-contact-email').innerText}
+Subdomains: ${document.getElementById('result-subdomains').innerText}
+`;
+            navigator.clipboard.writeText(resultText).then(() => {
+                document.getElementById('feedback-message').innerText = 'Results copied to clipboard!';
+            }, (err) => {
+                document.getElementById('feedback-message').innerText = 'Failed to copy results to clipboard.';
+                console.error('Async: Could not copy text: ', err);
+            });
+        }
+
+        // Initialize Leaflet Map
+        function initializeMap() {
+            var latitude = parseFloat(document.getElementById('result-latitude').innerText);
+            var longitude = parseFloat(document.getElementById('result-longitude').innerText);
+
+            if (!isNaN(latitude) && !isNaN(longitude)) {
+                var map = L.map('map').setView([latitude, longitude], 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+
+                L.marker([latitude, longitude]).addTo(map)
+                    .bindPopup('IP Location')
+                    .openPopup();
+            } else {
+                document.getElementById('map').innerText = 'No map available';
+            }
+        }
+
+        // Toggle More Information Section
+        function toggleMoreInfo() {
+            var moreInfo = document.getElementById('more-info');
+            var button = document.querySelector('.show-more-button');
+            if (moreInfo.style.display === 'none' || moreInfo.style.display === '') {
+                moreInfo.style.display = 'block';
+                button.innerText = 'Less Information ↑';
+            } else {
+                moreInfo.style.display = 'none';
+                button.innerText = 'More Information ↓';
+            }
+        }
+
+        // Toggle Preview Window
+        function togglePreview() {
+            var previewWindow = document.getElementById('preview-window');
+            var checkbox = document.getElementById('toggle-preview');
+            var locationInfo = document.querySelector('.location-info');
+            var tooltip = document.getElementById('toggle-tooltip');
+
+            if (checkbox.checked) {
+                previewWindow.classList.add('visible');
+                locationInfo.classList.add('preview-visible');
+                // Load URL into iframe
+                var url = document.getElementById('result-url').href;
+                document.getElementById('preview-iframe').src = url;
+                // Update aria-pressed for accessibility
+                checkbox.setAttribute('aria-pressed', 'true');
+                // Update tooltip text
+                tooltip.innerText = "Hide the preview of the site";
+            } else {
+                previewWindow.classList.remove('visible');
+                locationInfo.classList.remove('preview-visible');
+                // Clear iframe src
+                document.getElementById('preview-iframe').src = '';
+                // Update aria-pressed for accessibility
+                checkbox.setAttribute('aria-pressed', 'false');
+                // Update tooltip text
+                tooltip.innerText = "Show preview of the site";
+            }
+        }
+
+        // Initialize Map on Page Load
+        document.addEventListener('DOMContentLoaded', function () {
+            if (document.getElementById('result-latitude') && document.getElementById('result-longitude')) {
+                initializeMap();
+            }
+            
+            // Logo animations
+            const logo = document.querySelector('.logo img');
+
+            // Add the zoom out and spin animation on page load
+            logo.classList.add('zoom-spin-once');
+            setTimeout(function() {
+                logo.classList.remove('zoom-spin-once');
+            }, 1000); // Duration matches the animation duration
+
+            // Then, spin the logo every 7 seconds
+            setInterval(function() {
+                logo.classList.add('spin-once');
+                setTimeout(function() {
+                    logo.classList.remove('spin-once');
+                }, 1000); // Duration matches the animation duration
+            }, 7000); // Interval between spins (7 seconds)
+
+            // Read the data attributes from the body tag
+            const bodyElement = document.body;
+            const showLoginModal = JSON.parse(bodyElement.getAttribute('data-show-login-modal'));
+            const showRegisterModal = JSON.parse(bodyElement.getAttribute('data-show-register-modal'));
+
+            // Modal Elements
+            const registerBtn = document.getElementById('signup-btn');
+            const loginBtn = document.getElementById('login-btn');
+            const registerModal = document.getElementById('register-modal');
+            const loginModal = document.getElementById('login-modal');
+            const closeRegister = document.getElementById('close-register');
+            const closeLogin = document.getElementById('close-login');
+
+            // Open Modals if Flags are True
+            if (showLoginModal) {
+                loginModal.style.display = 'flex';
+            }
+
+            if (showRegisterModal) {
+                registerModal.style.display = 'flex';
+            }
+
+            // Open Register Modal
+            if (registerBtn) {
+                registerBtn.onclick = function() {
+                    registerModal.style.display = 'flex';
+                };
+            }
+
+            // Open Login Modal
+            if (loginBtn) {
+                loginBtn.onclick = function() {
+                    loginModal.style.display = 'flex';
+                };
+            }
+
+            // Close Register Modal
+            if (closeRegister) {
+                closeRegister.onclick = function() {
+                    registerModal.style.display = 'none';
+                };
+            }
+
+            // Close Login Modal
+            if (closeLogin) {
+                closeLogin.onclick = function() {
+                    loginModal.style.display = 'none';
+                };
+            }
+
+            // Close modals when clicking outside the modal content
+            window.onclick = function(event) {
+                if (event.target == registerModal) {
+                    registerModal.style.display = 'none';
+                }
+                if (event.target == loginModal) {
+                    loginModal.style.display = 'none';
+                }
+                 // Side Panel Elements
+            const menuBtn = document.getElementById('menu-btn');
+            const sidePanel = document.getElementById('side-panel');
+
+            // Open Side Panel
+            if (menuBtn) {
+                menuBtn.onclick = function() {
+                    sidePanel.style.width = '250px';
+                };
+            }
+
+            // Function to close side panel
+            window.closeSidePanel = function() {
+                sidePanel.style.width = '0';
+            };
+
+            // Close modals and side panel when clicking outside
+            window.onclick = function(event) {
+                if (event.target == registerModal) {
+                    registerModal.style.display = 'none';
+                }
+                if (event.target == loginModal) {
+                    loginModal.style.display = 'none';
+                }
+                if (event.target == sidePanel) {
+                    sidePanel.style.width = '0';
+                }
+            };
+            };
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Head content -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Include favicon -->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%),
+                        radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%);
+            background-size: 4px 4px;
+            background-position: 0 0, 2px 2px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Hero section */
+        .hero {
+            position: relative;
+            width: 100%;
+            min-height: 70vh;
+            background: linear-gradient(to top, #113d24, #0d1b2a);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Add the background pattern to the hero section */
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%),
+                        radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%);
+            background-size: 4px 4px;
+            background-position: 0 0, 2px 2px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Ensure hero content is above the pseudo-element */
+        .hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Adjust the logo styles */
+        .hero .logo {
+            max-width: 300px;
+            margin-top: -30px;
+            margin-bottom: 10px;
+            display: block;
+            transform-origin: center center;
+        }
+
+        /* Define the spin animation with slow start and stop */
+        @keyframes spinLogo {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Define the zoom and spin animation for page load */
+        @keyframes zoomSpinOnce {
+            from {
+                transform: scale(0.5) rotate(0deg);
+            }
+            to {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+
+        /* Class to trigger the spin */
+        .spin-once {
+            animation: spinLogo 1s ease-in-out;
+            transform-origin: center center;
+        }
+
+        /* Class to trigger the zoom and spin on page load */
+        .zoom-spin-once {
+            animation: zoomSpinOnce 1s ease-in-out;
+            transform-origin: center center;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        .hero p {
+            font-size: 24px;
+            margin-bottom: 40px;
+            max-width: 600px;
+        }
+        .hero .search-bar {
+            display: flex;
+            width: 80%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+        .hero .search-bar input {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px 0 0 50px;
+            outline: none;
+            background-color: #fff;
+            color: #000;
+        }
+        .hero .search-bar input::placeholder {
+            color: #888;
+        }
+        .hero .search-bar button {
+            padding: 15px 30px;
+            font-size: 18px;
+            border: none;
+            border-radius: 0 50px 50px 0;
+            background-color: #0e9a59;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .hero .search-bar button:hover {
+            background-color: #0c7a4a;
+        }
+
+        /* New Image Row Styles */
+        .image-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .image-row img {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+        }
+
+        /* Error message */
+        .error-message {
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        /* Info section */
+        .info-section {
+            padding: 60px 20px;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        .info-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #0d1b2a;
+        }
+        .info-section p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            color: #555;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+        .info-section img {
+            max-width: 100%;
+            height: auto;
+            background: transparent;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            background-color: #0d1b2a;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(68, 68, 68, 0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none;
+        }
+
+        .spinner-logo {
+            width: 100px;
+            height: 100px;
+            animation: spin 3s linear infinite;
+            transform-origin: center center;
+            border-radius: 50%;
+            overflow: hidden;
+            object-fit: cover;
+        }
+
+        .loading-overlay .spinner-text {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Custom scrollbar styles */
+        /* For WebKit browsers */
+        ::-webkit-scrollbar {
+            width: 16px;
+            z-index: 1000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #364d32; 
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background-color: #0f2d0c;
+        }
+
+        /* For Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #364d32 #0f2d0c;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 36px;
+            }
+            .hero p {
+                font-size: 18px;
+            }
+            .hero .search-bar input,
+            .hero .search-bar button {
+                font-size: 16px;
+                padding: 12px 15px;
+            }
+            .info-section h2 {
+                font-size: 28px;
+            }
+            .info-section p {
+                font-size: 16px;
+            }
+            .image-row img {
+                width: 80px;
+                height: 80px;
+            }
+        }
+
+        /* Button Container Styles */
+        .button-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .gradient-button {
+            background: linear-gradient(to bottom, #253f65, #113d24);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.4s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-button:hover {
+            background: linear-gradient(to bottom, #253f65, #113d24);
+        }
+
+        /* Hamburger Menu Button */
+        .menu-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Side Panel Styles */
+        .side-panel {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1002;
+            top: 0;
+            right: 0;
+            background-color: #253f65;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+        }
+
+        .side-panel a {
+            padding: 10px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #d4d4d4;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .side-panel a:hover {
+            box-shadow: 10px 8px 50px rgba(22, 22, 22, 0.5);
+        }
+
+        .side-panel .closebtn {
+            position: absolute;
+            top: 20px;
+            left: 25px;
+            font-size: 24px; /* Adjusted size for the icon */
+            color: #ffffff;
+            background: none; /* Remove default button background */
+            border: none; /* Remove default button border */
+            cursor: pointer; /* Change cursor to pointer on hover */
+            padding: 0; /* Remove default padding */
+        }
+
+        .side-panel .closebtn:hover {
+            color: #ff0000; /* Optional: Change color on hover */
+        }
+    </style>
+</head>
+<body data-show-login-modal="{{ show_login_modal|default(false)|tojson }}"
+      data-show-register-modal="{{ show_register_modal|default(false)|tojson }}">
+    <!-- Side Panel -->
+    <div id="side-panel" class="side-panel">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidePanel()">
+            <i class="fas fa-times"></i>
+        </a>
+        <a href="{{ url_for('auth.account') }}">Account</a>
+        <a href="{{ url_for('auth.settings') }}">Settings</a>
+        <hr style="border: 0; height: 1px; background: #120545; margin: 20px 0;">
+        <a href="{{ url_for('auth.history') }}">History</a>
+        <a href="{{ url_for('auth.favourites') }}">Favourites</a>
+        <hr style="border: 0; height: 1px; background: #120545; margin: 20px 0;">
+        <a href="{{ url_for('auth.help') }}">Help</a>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+
+        <!-- Add more navigation links as needed -->
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <!-- Button Container -->
+        <div class="button-container">
+            {% if current_user.is_authenticated %}
+                <button class="menu-button" id="menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            {% else %}
+                <button class="gradient-button" id="signup-btn">Sign Up</button>
+                <button class="gradient-button" id="login-btn">Login</button>
+            {% endif %}
+        </div>
+
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" class="logo">
+        <h1>Discover Websites Safely & Anonymously</h1>
+        <p>Enter any URL to predict with the help of AI its safety and explore the web with confidence.</p>
+        {% if error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> {{ error }}
+        </div>
+        {% endif %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">
+                        <i class="fas fa-info-circle"></i> {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form id="prediction-form" action="{{ url_for('predict') }}" method="POST" class="search-bar">
+            <input type="text" id="link" name="link" placeholder="e.g., https://www.example.com" required pattern="https?://.+" title="Please enter a valid URL starting with http:// or https://">
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- New Image Row -->
+        <div class="image-row">
+            <img src="{{ url_for('static', filename='images/crt.png') }}" alt="CRT">
+            <img src="{{ url_for('static', filename='images/iframe.png') }}" alt="Iframe">
+            <img src="{{ url_for('static', filename='images/leaflet.png') }}" alt="Leaflet">
+            <img src="{{ url_for('static', filename='images/whois.png') }}" alt="Whois">
+            <img src="{{ url_for('static', filename='images/ssl.png') }}" alt="SSL">
+        </div>
+    </section>
+
+    <!-- Info Section -->
+    <section class="info-section">
+        <h2>About Model Technology</h2>
+        <p>
+            Our platform utilizes a sophisticated Random Forest model, an ensemble learning method that builds multiple decision trees and merges their predictions for accurate and reliable results. This approach enhances prediction accuracy and effectively generalizes to unseen data, ensuring you can browse the internet with peace of mind.
+        </p>
+        <img src="{{ url_for('static', filename='images/293921.png') }}" alt="Random Forest Illustration">
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2023-2025 Developed by Manuel Vasilev (23651808) as part of graduation thesis. All rights reserved.
+    </footer>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Loading..." id="loading-spinner" class="spinner-logo">
+        <div id="loading-message" class="spinner-text">Analyzing...</div>
+    </div>
+
+    <!-- Include Modals -->
+    {% include '_login_modal.html' %}
+    {% include '_register_modal.html' %}
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('prediction-form');
+            const loadingOverlay = document.getElementById('loading-overlay');
+            const loadingMessage = document.getElementById('loading-message');
+            const logo = document.querySelector('.hero .logo');
+            let spinInterval;
+
+            // Function to start spinning the hero logo
+            function startSpinning() {
+                // Add the zoom and spin animation on page load
+                logo.classList.add('zoom-spin-once');
+                setTimeout(function() {
+                    logo.classList.remove('zoom-spin-once');
+                }, 1000); // Duration matches the animation duration
+
+                // Then, spin the logo every 7 seconds
+                spinInterval = setInterval(function() {
+                    logo.classList.add('spin-once');
+                    setTimeout(function() {
+                        logo.classList.remove('spin-once');
+                    }, 1000); // Duration matches the animation duration
+                }, 7000); // Interval between spins (7 seconds)
+            }
+
+            // Start spinning when the page loads
+            startSpinning();
+
+            form.addEventListener('submit', function (e) {
+                const input = document.getElementById('link');
+                const urlPattern = /^https?:\/\/.+/;
+                if (!urlPattern.test(input.value)) {
+                    e.preventDefault(); // Prevent form submission
+                    alert('Please enter a valid URL starting with http:// or https://');
+                    input.focus();
+                    return false;
+                }
+                // Show the loading overlay
+                loadingOverlay.style.display = 'flex';
+                loadingMessage.textContent = 'Analyzing...';
+
+                // Stop the hero logo from spinning
+                if (spinInterval) {
+                    clearInterval(spinInterval);
+                }
+                logo.classList.remove('spin-once', 'zoom-spin-once');
+            });
+
+            // Read the data attributes from the body tag
+            const bodyElement = document.body;
+            const showLoginModal = JSON.parse(bodyElement.getAttribute('data-show-login-modal'));
+            const showRegisterModal = JSON.parse(bodyElement.getAttribute('data-show-register-modal'));
+
+            // Modal Elements
+            const registerBtn = document.getElementById('signup-btn');
+            const loginBtn = document.getElementById('login-btn');
+            const registerModal = document.getElementById('register-modal');
+            const loginModal = document.getElementById('login-modal');
+            const closeRegister = document.getElementById('close-register');
+            const closeLogin = document.getElementById('close-login');
+
+            // Open Modals if Flags are True
+            if (showLoginModal) {
+                loginModal.style.display = 'flex';
+            }
+
+            if (showRegisterModal) {
+                registerModal.style.display = 'flex';
+            }
+
+            // Open Register Modal
+            if (registerBtn) {
+                registerBtn.onclick = function() {
+                    registerModal.style.display = 'flex';
+                };
+            }
+
+            // Open Login Modal
+            if (loginBtn) {
+                loginBtn.onclick = function() {
+                    loginModal.style.display = 'flex';
+                };
+            }
+
+            // Close Register Modal
+            if (closeRegister) {
+                closeRegister.onclick = function() {
+                    registerModal.style.display = 'none';
+                };
+            }
+
+            // Close Login Modal
+            if (closeLogin) {
+                closeLogin.onclick = function() {
+                    loginModal.style.display = 'none';
+                };
+            }
+
+            // Side Panel Elements
+            const menuBtn = document.getElementById('menu-btn');
+            const sidePanel = document.getElementById('side-panel');
+
+            // Open Side Panel
+            if (menuBtn) {
+                menuBtn.onclick = function() {
+                    sidePanel.style.width = '250px';
+                };
+            }
+
+            // Function to close side panel
+            window.closeSidePanel = function() {
+                sidePanel.style.width = '0';
+            };
+
+            // Close modals when clicking outside the modal content
+            window.onclick = function(event) {
+                if (event.target == registerModal) {
+                    registerModal.style.display = 'none';
+                }
+                if (event.target == loginModal) {
+                    loginModal.style.display = 'none';
+                }
+                // Optionally, close side panel when clicking outside
+                if (event.target == sidePanel) {
+                    sidePanel.style.width = '0';
+                }
+            };
+        });
+    </script>
+</body>
+</html>

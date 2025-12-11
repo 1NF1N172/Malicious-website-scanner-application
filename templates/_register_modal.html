@@ -1,0 +1,141 @@
+<!-- templates/_register_modal.html -->
+<div id="register-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="close-register">&times;</span>
+        <div class="modal-header">
+            <h2>Register</h2>
+        </div>
+        {% if register_error %}
+        <div class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> {{ register_error }}
+        </div>
+        {% endif %}
+        {% if register_message %}
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i> {{ register_message }}
+        </div>
+        {% endif %}
+        <form id="register-form" action="{{ url_for('auth.register') }}" method="POST">
+            <label for="register-username">Username:</label>
+            <input type="text" id="register-username" name="username" placeholder="Enter your username" required>
+
+            <label for="register-email">Email:</label>
+            <input type="email" id="register-email" name="email" placeholder="Enter your email" required>
+
+            <label for="register-password">Password:</label>
+            <input type="password" id="register-password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit">Sign Up</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Modal Styles (copied from index.html) */
+    .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1001; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0, 0, 0, 0.6); /* Black w/ opacity */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: #1b2943;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 400px;
+        border-radius: 10px;
+        position: relative;
+        color: #d4d4d4;
+        box-shadow: 0 6px 50px rgba(22, 22, 22, 0.5);
+    }
+
+    .close {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .close:hover,
+    .close:focus {
+        color: #ffffff;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .modal-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+        color: #293f67;
+        text-shadow: 
+            1px 1px 5px rgba(0, 0, 0, 1),
+        -1px -1px 1px rgba(254, 254, 254, 0.5);
+    }
+
+    /* Error message inside modal */
+    .error-message {
+        background-color: rgba(255, 0, 0, 0.1);
+        color: #ff0000;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    /* Form Styles */
+    #register-form label {
+        display: block;
+        margin-bottom: 5px;
+        color: #d4d4d4;
+    }
+
+    #register-form input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: none;
+        border-radius: 5px;
+        background-color: #2a3e5f;
+        color: #fff;
+    }
+
+    #register-form button {
+        width: 100%;
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+        background-color: #0e9a59;
+        color: #fff;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #register-form button:hover {
+        background-color: #0c7a4a;
+    }
+       /* Success message styling */
+       .success-message {
+        background-color: rgba(0, 255, 0, 0.1);
+        color: #00cc00;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        display: block;
+    }
+</style>

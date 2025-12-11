@@ -1,0 +1,534 @@
+<!-- account.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Account Settings</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <!-- Include Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Basic Reset and Styling */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to top, #113d24, #0d1b2a);
+            color: #d4d4d4;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 16px;
+            z-index: 1000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #324466;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background-color: #1b2943;
+        }
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #324466 #1b2943;
+        }
+
+        /* Body Layout */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-attachment: fixed;
+            background-size: 100% 100%;
+        }
+
+        /* Background Pattern */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%),
+                        radial-gradient(circle, rgba(255, 255, 255, 0.1) 10%, transparent 11%);
+            background-size: 4px 4px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Logo Styling */
+        .logo {
+            margin: 10px 0;
+            text-align: center;
+            z-index: 1;
+            box-shadow: 1 5px 50px rgba(22, 22, 22, 0.5);
+            position: relative;
+        }
+        .logo img {
+            width: 140px;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.3s;
+            transform-origin: center center;
+        }
+        .logo img:hover {
+            opacity: 0.8;
+        }
+        /* Define the spin animation with slow start and stop */
+        @keyframes spinLogo {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Define the zoom and spin animation for page load */
+        @keyframes zoomSpinOnce {
+            from {
+                transform: scale(2) rotate(0deg);
+            }
+            to {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+
+        /* Class to trigger the spin */
+        .spin-once {
+            animation: spinLogo 1s ease-in-out;
+            transform-origin: center center;
+        }
+
+        /* Class to trigger the zoom and spin on page load */
+        .zoom-spin-once {
+            animation: zoomSpinOnce 1s ease-in-out;
+            transform-origin: center center;
+        }
+
+        /* Button Container Styles */
+        .button-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 100;
+        }
+
+        .gradient-button {
+            background: linear-gradient(to bottom, #253f65, #113d24);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.4s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .gradient-button:hover {
+            background: linear-gradient(to bottom, #253f65, #113d24);
+        }
+
+        /* Hamburger Menu Button */
+        .menu-button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+            border-radius: 50%;
+            transition: background 0.3s ease;
+        }
+
+        .menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Side Panel Styles */
+        .side-panel {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            z-index: 1002;
+            top: 0;
+            left: 0;
+            background-color: #1b2943;
+            overflow-x: hidden;
+            padding-top: 60px;
+            transition: 0.5s;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .side-panel.closed {
+            width: 0;
+            padding-top: 0;
+            overflow: hidden;
+        }
+
+        .side-panel a {
+            padding: 10px 30px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #d4d4d4;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .side-panel a:hover {
+            box-shadow: 10px 8px 50px rgba(22, 22, 22, 0.5);
+        }
+
+        .side-panel hr {
+            border: 0;
+            height: 1px;
+            background: #120545;
+            margin: 20px 0;
+        }
+
+        /* Content Wrapper to Center Main Content */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        /* Container for Account Settings */
+        .account-container {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+            background-color: #1b2943;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 6px 50px rgba(22, 22, 22, 0.5);
+            z-index: 1;
+            margin-bottom: 20px;
+            display: flex;
+        }
+
+        /* Left Menu Styles */
+        .left-menu {
+            width: 250px;
+            background-color: #253f65;
+            border-radius: 8px;
+            padding: 20px;
+            margin-right: 20px;
+            box-shadow: 2px 0 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .left-menu a {
+            display: block;
+            color: #d4d4d4;
+            text-decoration: none;
+            margin-bottom: 15px;
+            font-size: 18px;
+            transition: color 0.3s;
+        }
+
+        .left-menu a:hover {
+            color: #81c784;
+        }
+
+        .left-menu hr {
+            border: 0;
+            height: 1px;
+            background: #120545;
+            margin: 20px 0;
+        }
+
+        /* Account Details Section */
+        .account-details {
+            flex: 1;
+            background-color: #253f65;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 6px 50px rgba(22, 22, 22, 0.5);
+        }
+
+        .account-details h1 {
+            color: #81c784;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background-color: #1b2943;
+            margin: 0 auto 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-picture input[type="file"] {
+            display: none;
+        }
+
+        .profile-picture label {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            padding: 5px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .account-details form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .account-details label {
+            display: block;
+            margin-bottom: 5px;
+            color: #d4d4d4;
+            font-size: 16px;
+        }
+
+        .account-details input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #324466;
+            border-radius: 4px;
+            background-color: #1b2943;
+            color: #d4d4d4;
+            font-size: 16px;
+        }
+
+        .account-details button {
+            width: 100%;
+            padding: 10px;
+            background-color: #2c3e50;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .account-details button:hover {
+            background-color: #34495e;
+        }
+
+        .created-date {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            color: #d4d4d4;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .account-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            .left-menu {
+                width: 100%;
+                margin: 0 0 20px 0;
+            }
+            .account-details {
+                width: 100%;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            color: #fff;
+            text-align: center;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body data-show-login-modal="{{ show_login_modal|default(false)|tojson }}"
+      data-show-register-modal="{{ show_register_modal|default(false)|tojson }}">
+
+    <!-- Side Panel -->
+    <div id="side-panel" class="side-panel closed">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeSidePanel()">
+            <i class="fas fa-times"></i>
+        </a>
+        <a href="{{ url_for('auth.account') }}">Account</a>
+        <hr>
+        <a href="{{ url_for('auth.history') }}">History</a>
+        <a href="{{ url_for('auth.favourites') }}">Favourites</a>
+        <hr>
+        <a href="{{ url_for('auth.logout') }}">Logout</a>
+    </div>
+
+    <!-- Logo Section -->
+    <div class="logo">
+        <!-- Button Container -->
+        <div class="button-container">
+            {% if current_user.is_authenticated %}
+                <button class="menu-button" id="menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            {% else %}
+                <button class="gradient-button" id="signup-btn">Sign Up</button>
+                <button class="gradient-button" id="login-btn">Login</button>
+            {% endif %}
+        </div>
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" onclick="redirectToHomePage()">
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="content-wrapper">
+        <div class="account-container">
+            <!-- Left Menu -->
+            <div class="left-menu">
+                <a href="{{ url_for('auth.account') }}">Account</a>
+                <hr>
+                <a href="{{ url_for('auth.history') }}">History</a>
+                <a href="{{ url_for('auth.favourites') }}">Favourites</a>
+                <hr>
+                <a href="{{ url_for('auth.logout') }}">Logout</a>
+            </div>
+
+            <!-- Account Details -->
+            <div class="account-details">
+                <h1>Account Settings</h1>
+                <!-- Profile Picture -->
+                <div class="profile-picture">
+                    {% if current_user.profile_picture %}
+                        <img src="{{ url_for('static', filename='profile_pictures/' + current_user.profile_picture) }}" alt="Profile Picture">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='images/default_profile.png') }}" alt="Default Profile Picture">
+                    {% endif %}
+                    <label for="profile-picture-input">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="profile-picture-input" name="profile_picture" accept="image/*">
+                </div>
+
+                <!-- Account Information Form -->
+                <form action="{{ url_for('auth.account') }}" method="POST" enctype="multipart/form-data">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="{{ current_user.username }}" required>
+
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+
+                    <label for="password">New Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter new password">
+
+                    <button type="submit">Update Account</button>
+                </form>
+
+                <!-- Account Creation Date -->
+                <div class="created-date">
+                    <p>Account Created On: {{ current_user.creation_date.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2023-2025 Developed by Manuel Vasilev (23651808) as part of graduation thesis. All rights reserved.
+    </footer>
+
+    <!-- Include Modals -->
+    {% include '_login_modal.html' %}
+    {% include '_register_modal.html' %}
+
+    <!-- JavaScript -->
+    <script>
+        // Redirect to Home Page
+        function redirectToHomePage() {
+            window.location.href = "/";
+        }
+
+        // Side Panel Elements
+        const menuBtn = document.getElementById('menu-btn');
+        const sidePanel = document.getElementById('side-panel');
+
+        // Open Side Panel
+        if (menuBtn) {
+            menuBtn.onclick = function() {
+                sidePanel.classList.remove('closed');
+            };
+        }
+
+        // Function to close side panel
+        function closeSidePanel() {
+            sidePanel.classList.add('closed');
+        }
+
+        // Close modals when clicking outside the modal content
+        window.onclick = function(event) {
+            const registerModal = document.getElementById('register-modal');
+            const loginModal = document.getElementById('login-modal');
+
+            if (event.target == registerModal) {
+                registerModal.style.display = 'none';
+            }
+            if (event.target == loginModal) {
+                loginModal.style.display = 'none';
+            }
+        };
+
+        // Logo animations
+        document.addEventListener('DOMContentLoaded', function () {
+            const logo = document.querySelector('.logo img');
+
+            // Add the zoom out and spin animation on page load
+            logo.classList.add('zoom-spin-once');
+            setTimeout(function() {
+                logo.classList.remove('zoom-spin-once');
+            }, 1000); // Duration matches the animation duration
+
+            // Then, spin the logo every 7 seconds
+            setInterval(function() {
+                logo.classList.add('spin-once');
+                setTimeout(function() {
+                    logo.classList.remove('spin-once');
+                }, 1000); // Duration matches the animation duration
+            }, 7000); // Interval between spins (7 seconds)
+        });
+
+        // Handle Profile Picture Upload
+        const profilePictureInput = document.getElementById('profile-picture-input');
+        const profilePictureForm = document.querySelector('.account-details form');
+        const profilePictureLabel = document.querySelector('.profile-picture label');
+
+        profilePictureInput.addEventListener('change', function() {
+            profilePictureForm.submit();
+        });
+
+    </script>
+</body>
+</html>

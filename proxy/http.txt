@@ -1,0 +1,10 @@
+198.23.239.134:6540:lfhchccj:9i8ldqafhxgh
+207.244.217.165:6712:lfhchccj:9i8ldqafhxgh
+107.172.163.27:6543:lfhchccj:9i8ldqafhxgh
+173.211.0.148:6641:lfhchccj:9i8ldqafhxgh
+161.123.152.115:6360:lfhchccj:9i8ldqafhxgh
+216.10.27.159:6837:lfhchccj:9i8ldqafhxgh
+167.160.180.203:6754:lfhchccj:9i8ldqafhxgh
+154.36.110.199:6853:lfhchccj:9i8ldqafhxgh
+173.0.9.70:5653:lfhchccj:9i8ldqafhxgh
+173.0.9.209:5792:lfhchccj:9i8ldqafhxgh
