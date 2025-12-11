@@ -9,12 +9,12 @@ Add your captures to `assets/screenshots/` and update the table below if you cha
 
 | Screen | File |
 | --- | --- |
-| Landing & search | `assets/screenshots/home.png` |
-| Result (offline sample) | `assets/screenshots/result-offline.png` |
-| Result (phishing sample) | `assets/screenshots/result-phishing.png` |
-| Result (legit sample) | `assets/screenshots/result-legit-1.png` |
-| Result (legit sample 2) | `assets/screenshots/result-legit-2.png` |
-| About model | `assets/screenshots/about-model.png` |
+| Landing & search | `assets/screenshots/DR_Search.png` |
+| Result (offline sample) | `assets/screenshots/DR_Result_offline.png` |
+| Result (phishing sample) | `assets/screenshots/DR_result_phishing.png` |
+| Result (legit sample) | `assets/screenshots/DR_Result_legit.png` |
+| Result (map/location) | `assets/screenshots/DR_Result_map.png` |
+| Result (preview) | `assets/screenshots/DR_result_preview.png` |
 
 Overview
 --------
