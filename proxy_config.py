@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 api_key = 'rzva1gtogzp2ftthptpzb4vfoffr92bkhgf1hik1'
 
 # креденшлите
-proxy_username = 'lfhchccj'      
-proxy_password = '9i8ldqafhxgh'  
+proxy_username = ''      
+proxy_password = ''  
 
 # басе урл 
 base_url = 'https://proxy.webshare.io/api/v2'
