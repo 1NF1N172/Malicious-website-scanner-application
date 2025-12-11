@@ -3,26 +3,13 @@ Malicious Website Scanner
 
 AI-assisted Flask web app that predicts whether a URL is legitimate or phishing. It combines a Random Forest classifier with a curated lookup table, performs live HTTP checks, WHOIS enrichment, SSL validation, IP geolocation, and subdomain enumeration to provide an at-a-glance safety report with a visual site preview.
 
-Screenshots
------------
-Add your captures to `assets/screenshots/` and update the table below if you change filenames.
-
-| Screen | File |
-| --- | --- |
-| Landing & search | `assets/screenshots/DR_Search.png` |
-| Result (offline sample) | `assets/screenshots/DR_Result_offline.png` |
-| Result (phishing sample) | `assets/screenshots/DR_result_phishing.png` |
-| Result (legit sample) | `assets/screenshots/DR_Result_legit.png` |
-| Result (legit sample) | `assets/screenshots/DR_Result_domain.png` |
-| Result (map/location) | `assets/screenshots/DR_Result_map.png` |
-| Result (preview) | `assets/screenshots/DR_result_preview.png` |
-
-Preview
+Screenshots Preview
 -------
 ![Landing & search](assets/screenshots/DR_Search.png)
 ![Result offline](assets/screenshots/DR_Result_offline.png)
 ![Result phishing](assets/screenshots/DR_result_phishing.png)
 ![Result legit](assets/screenshots/DR_Result_legit.png)
+![Result legit](assets/screenshots/DR_Result_domain.png)
 ![Result map](assets/screenshots/DR_Result_map.png)
 ![Result preview](assets/screenshots/DR_result_preview.png)
 
