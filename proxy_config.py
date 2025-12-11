@@ -1,30 +1,32 @@
 # proxy_config.py
 
-import requests
-import random
 import logging
+import os
+import random
+import requests
 
 # логгинг
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# API ключ
-api_key = 'rzva1gtogzp2ftthptpzb4vfoffr92bkhgf1hik1'
-
-# креденшлите
-proxy_username = ''      
-proxy_password = ''  
+# API key and credentials are supplied via environment to avoid hardcoding secrets
+api_key = os.environ.get('PROXY_API_KEY', '')
+proxy_username = os.environ.get('PROXY_USERNAME', '')
+proxy_password = os.environ.get('PROXY_PASSWORD', '')
 
 # басе урл 
 base_url = 'https://proxy.webshare.io/api/v2'
 
 # хеадърите с апи ключа
-headers = {
-    'Authorization': f'Token {api_key}'
-}
+headers = {}
+if api_key:
+    headers['Authorization'] = f'Token {api_key}'
 
 # фетчване на прксита
 def fetch_proxy_list():
+    if not api_key:
+        logger.warning("PROXY_API_KEY not set; skipping proxy fetch.")
+        return []
     proxies = []
     page = 1
     while True:
